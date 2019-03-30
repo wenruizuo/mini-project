@@ -1,3 +1,0 @@
-pip
-Flask
-cassandra-driver   --install-option="--no-cyton"

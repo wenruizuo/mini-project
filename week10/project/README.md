@@ -31,38 +31,46 @@ def profile(name):
 In Google Cloud, I try to use Cassandra and Tuberlete to merely demonstrate the doctor's name and their avg_charge_amt.
 Some key command is followed:
 
-# Set the region and zone for our new cluster.#
+#Set the region and zone for our new cluster.#
 gcloud config set compute/zone europe-west2-b
 export PROJECT_ID="$(gcloud config get-value project -q)"
-Cassandra in Kubernetes:
-# create a 3 node cluster named cassandra
+
+#create a 3 node cluster named cassandra#
 gcloud container clusters create cassandra --num-nodes=3 --machine-type "n1-standard-2"
-# define a service, a Headless service allows peer discovery,a Replication Controller allows us to scale up and down the number of containers
+
+#define a service, a Headless service allows peer discovery,a Replication Controller allows us to scale up and down the number of containers#
 wget -O cassandra-peer-service.yml http://tinyurl.com/yyxnephy 
 wget -O cassandra-service.yml http://tinyurl.com/y65czz8e
 wget -O cassandra-replication-controller.yml http://tinyurl.com/y2crfsl8
-# run component
+
+#run component#
 kubectl create -f cassandra-peer-service.yml
 kubectl create -f cassandra-service.yml
 kubectl create -f cassandra-replication-controller.yml
-# check and scale up nodes
+
+#check and scale up nodes#
 kubectl get pods -l name=cassandra
 kubectl scale rc cassandra --replicas=3
-# check the ring and find the running node 
+
+#check the ring and find the running node# 
 kubectl exec -it cassandra-** -- nodetool status 
 kubectl exec -it cassandra-** cqlsh
-# build keyspace and craete table via‘cqlsh’ and insert data to this table (tried to use doctor.CSV but still cannot get correct result)
+
+#build keyspace and craete table via‘cqlsh’ and insert data to this table (tried to use doctor.CSV but still cannot get correct result)#
 CREATE KEYSPACE doctor WITH REPLICATION =
   {'class' : 'SimpleStrategy', 'replication_factor' : 2};
 CREATE TABLE doctor.stats (name text PRIMARY KEY, avg_charge_amt float);
 INSERT INTO doctor.stats(name,avg_charge_amt) VALUES (‘Kim’,567.123);
 Select * from doctor.stats
-# bulid app.py/Dockerfile/Requirements.txt
+
+#bulid app.py/Dockerfile/Requirements.txt#
 view...
-# build data and put inot google respository
+
+#build data and put inot google respository#
 docker build -t gcr.io/${PROJECT_ID}/doctor-app:v1 .
 docker push gcr.io/${PROJECT_ID}/doctor-app:v1
-# Run as a service and get a externar IP 
+
+#Run as a service and get a externar IP#
 kubectl run iris5 --image=gcr.io/${PROJECT_ID}/doctor-app:v1 --port 8080
 kubectl expose deployment iris5 --type=LoadBalancer --port 80  --target-port 8080
 kubectl get services 

@@ -7,7 +7,9 @@ and public API: https://developer.betterdoctor.com
 
 
 The maptree for this mini_project:
+
 1)Utilize following code to complete interaction with external REST services, so as to Use of on an external Cloud database for persisting information.
+
 /*
 app = Flask(__name__)
 userkey = '081d07c1c7d279672704a4360fc45c7e'
